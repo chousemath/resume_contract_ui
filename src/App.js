@@ -5,6 +5,13 @@ import web3 from './web3';
 import resume from './resume';
 
 const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
+const waitingMessage = 'Waiting on transaction...';
+const styles = {
+  messageStyling: {
+    color: 'blue',
+    fontWeight: 'bold'
+  }
+};
 
 class App extends Component {
   state = {
@@ -13,7 +20,8 @@ class App extends Component {
     users: [],
     name: '',
     newName: '',
-    position: ''
+    position: '',
+    newPosition: ''
   };
 
   async account() {
@@ -43,7 +51,7 @@ class App extends Component {
 
   onSubmitNewName = async (event) => {
     event.preventDefault();
-    this.setState({ message: 'Waiting on transaction...' });
+    this.setState({ message: waitingMessage });
     await resume.methods.setName(web3.utils.utf8ToHex(this.state.newName)).send({ from: await this.account() });
     this.setState({ message: 'Your new name has been successfully transmitted to the blockchain!' });
     const name = await this.getName();
@@ -54,10 +62,25 @@ class App extends Component {
     }, 3000);
   }
 
+  onSubmitNewPosition = async (event) => {
+    event.preventDefault();
+    this.setState({ message: waitingMessage });
+    await resume.methods.setPosition(web3.utils.utf8ToHex(this.state.newPosition)).send({ from: await this.account() });
+    this.setState({ message: 'Your new position has been successfully transmitted to the blockchain!' });
+    const position = await this.getPosition();
+    const users = await resume.methods.getUsers().call();
+    this.setState({ position, users });
+    setTimeout(() => this.setState({ message: '' }), 3000);
+  }
+
   render() {
     let message;
     if (this.state.message) {
-      message = <h3>{this.state.message}</h3>;
+      message = <h3 style={styles.messageStyling}>{this.state.message}</h3>;
+    }
+    let users;
+    if (this.state.users && this.state.users.length > 0) {
+      users = this.state.users.join(', ');
     }
 
     return (
@@ -71,6 +94,7 @@ class App extends Component {
         <hr />
         <p>Your position: {this.state.position}</p>
         <hr />
+
         <form onSubmit={this.onSubmitNewName}>
           <h3>Update your profile</h3>
           <div>
@@ -83,9 +107,25 @@ class App extends Component {
           </div>
           <button type="submit">Save your name to the blockchain</button>
         </form>
+
+        <hr />
+
+        <form onSubmit={this.onSubmitNewPosition}>
+          <h3>Update your current position (job)</h3>
+          <div>
+            <label>Your current position</label>
+            <input
+              type="text"
+              value={this.state.newPosition}
+              onChange={event => this.setState({ newPosition: event.target.value })}
+            />
+          </div>
+          <button>Save your position to the blockchain</button>
+        </form>
+
         <hr />
         <p>There are currently {this.state.users.length} users participating in this contract</p>
-        <p>{this.users}</p>
+        <p>{users}</p>
       </div>
     );
   }
