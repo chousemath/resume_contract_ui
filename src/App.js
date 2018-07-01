@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
-import web3 from './web3';
+import web3 from './web3.js';
 import resume from './resume';
+import { Button, Input, InputGroup, InputGroupAddon } from 'reactstrap';
 
 const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 const waitingMessage = 'Waiting on transaction...';
+const messageResetDelay = 3000;
 const successMessage = (attributeName) => `Your new ${attributeName} has been successfully saved on the blockchain!`;
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const genders = ['unspecified', 'male', 'female', 'other'];
@@ -13,6 +14,9 @@ const cities = ['unspecified', 'CityA', 'CityB', 'CityC'];
 const regions = ['unspecified', 'RegionA', 'RegionB', 'RegionC'];
 
 const styles = {
+  columnSpacing: {
+    marginTop: '16px'
+  },
   messageStyling: {
     color: 'blue',
     fontWeight: 'bold'
@@ -38,7 +42,9 @@ class App extends Component {
     newAddressStreet: '',
     newAddressCity: 0,
     newAddressRegion: 0,
-    newAddressZipcode: 0
+    newAddressZipcode: 0,
+    phone: '',
+    newPhone: ''
   };
 
   async account() {
@@ -95,14 +101,13 @@ class App extends Component {
     return this.hexToUtf8(position);
   }
 
-  async getUniqueUsers() {
-    const users = await resume.methods.getUsers().call();
-    return users.filter((value, index, self) => self.indexOf(value) === index);
+  async getUsers() {
+    return await resume.methods.getUsers().call();
   }
 
   async componentDidMount() {
     const manager = await resume.methods.manager().call();
-    const users = await this.getUniqueUsers();
+    const users = await this.getUsers();
     const name = await this.getName();
     const position = await this.getPosition();
     const dateOfBirth = await this.getDateOfBirth();
@@ -119,7 +124,8 @@ class App extends Component {
       name,
       phone,
       position,
-      users
+      users,
+      phone
     });
   }
 
@@ -129,12 +135,22 @@ class App extends Component {
     await resume.methods.setName(web3.utils.utf8ToHex(this.state.newName)).send({ from: await this.account() });
     this.setState({ message: successMessage('name') });
     const name = await this.getName();
-    const users = await this.getUniqueUsers();
+    const users = await this.getUsers();
     const newName = '';
     this.setState({ name, users, newName });
-    setTimeout(() => {
-      this.setState({ message: '' });
-    }, 3000);
+    setTimeout(() => this.setState({ message: '' }), messageResetDelay);
+  }
+
+  onSubmitNewPhone = async (event) => {
+    event.preventDefault();
+    this.setState({ message: waitingMessage });
+    await resume.methods.setPhone(web3.utils.utf8ToHex(this.state.newPhone)).send({ from: await this.account() });
+    this.setState({ message: successMessage('phone number') });
+    const phone = await this.getPhone();
+    const users = await this.getUsers();
+    const newPhone = '';
+    this.setState({ phone, users, newPhone });
+    setTimeout(() => this.setState({ message: '' }), messageResetDelay);
   }
 
   onSubmitNewPosition = async (event) => {
@@ -143,10 +159,10 @@ class App extends Component {
     await resume.methods.setPosition(web3.utils.utf8ToHex(this.state.newPosition)).send({ from: await this.account() });
     this.setState({ message: successMessage('position (job)') });
     const position = await this.getPosition();
-    const users = await this.getUniqueUsers();
+    const users = await this.getUsers();
     const newPosition = '';
     this.setState({ position, users, newPosition });
-    setTimeout(() => this.setState({ message: '' }), 3000);
+    setTimeout(() => this.setState({ message: '' }), messageResetDelay);
   }
 
   onSubmitNewDateOfBirth = async (event) => {
@@ -160,9 +176,9 @@ class App extends Component {
     ).getTime() / 1000)).send({ from: await this.account() });
     this.setState({ message: successMessage('date of birth') });
     const dateOfBirth = await this.getDateOfBirth();
-    const users = await this.getUniqueUsers();
+    const users = await this.getUsers();
     this.setState({ dateOfBirth, users });
-    setTimeout(() => this.setState({ message: '' }), 3000);
+    setTimeout(() => this.setState({ message: '' }), messageResetDelay);
   }
 
   render() {
@@ -195,41 +211,38 @@ class App extends Component {
         <p>Your phone number: {this.state.phone}</p>
         <hr />
 
-        <div className="row">
+        <div className="row" style={styles.columnSpacing}>
           <div className="col-md-6">
             <form onSubmit={this.onSubmitNewName}>
-              <label htmlFor="new-name">Your full name</label>
-              <div className="input-group">
-                <input type="text"
+              <InputGroup>
+                <InputGroupAddon addonType="prepend">Full Name:</InputGroupAddon>
+                <Input
+                  placeholder="Enter your new name here"
+                  type="text"
                   value={this.state.newName}
                   onChange={event => this.setState({ newName: event.target.value })}
-                  className="form-control"
-                  id="new-name"
-                  placeholder="Enter your new name here..."
-                />
-                <span className="input-group-btn">
-                  <button type="submit" className="btn btn-primary">Save to the blockchain</button>
-                </span>
-              </div>
+                  step="1" />
+                  <Button type="submit" color="primary">Save</Button>
+              </InputGroup>
             </form>
           </div>
           <div className="col-md-6">
             <form onSubmit={this.onSubmitNewPosition}>
-              <label htmlFor="new-position">Your current position (job)</label>
-              <div className="input-group">
-                <input type="text"
+              <InputGroup>
+                <InputGroupAddon addonType="prepend">Current Position:</InputGroupAddon>
+                <Input
+                  placeholder="Enter your new position here"
+                  type="text"
                   value={this.state.newPosition}
                   onChange={event => this.setState({ newPosition: event.target.value })}
-                  className="form-control"
-                  id="new-position"
-                  placeholder="Enter your new position here..."
-                />
-                <span className="input-group-btn">
-                  <button type="submit" className="btn btn-success">Save to the blockchain</button>
-                </span>
-              </div>
+                  step="1"
+                  />
+                  <Button type="submit" color="success">Save</Button>
+              </InputGroup>
             </form>
           </div>
+        </div>
+        <div className="row" style={styles.columnSpacing}>
           <div className="col-md-6">
             <form onSubmit={this.onSubmitNewDateOfBirth}>
               <label htmlFor="new-dob">Your date of birth</label>
@@ -242,12 +255,28 @@ class App extends Component {
                   placeholder="Select your date of birth..."
                 />
                 <span className="input-group-btn">
-                  <button type="submit" className="btn btn-info">Save to the blockchain</button>
+                  <Button type="submit" color="info">Save to the blockchain</Button>
                 </span>
               </div>
             </form>
           </div>
-          <div className="col-md-6"></div>
+          <div className="col-md-6">
+            <form onSubmit={this.onSubmitNewPhone}>
+              <label htmlFor="new-phone">Your best phone number (mobile)</label>
+              <div className="input-group">
+                <input type="text"
+                  value={this.state.newPhone}
+                  onChange={event => this.setState({ newPhone: event.target.value })}
+                  className="form-control"
+                  id="new-phone"
+                  placeholder="Enter phone number here..."
+                />
+                <span className="input-group-btn">
+                  <Button type="submit" color="warning">Save to the blockchain</Button>
+                </span>
+              </div>
+            </form>
+          </div>
         </div>
         <hr />
         <div className="well well-lg">

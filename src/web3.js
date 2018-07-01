@@ -4,4 +4,5 @@ import Web3 from 'web3';
 const metamaskWeb3 = window.web3.currentProvider;
 // we then feed in metamask's version of web3 into our own version of web3
 const web3 = new Web3(metamaskWeb3);
+// export the module
 export default web3;
