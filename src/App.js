@@ -222,7 +222,7 @@ class App extends Component {
                   value={this.state.newName}
                   onChange={event => this.setState({ newName: event.target.value })}
                   step="1" />
-                  <Button type="submit" color="primary">Save</Button>
+                <Button type="submit" color="primary">Save</Button>
               </InputGroup>
             </form>
           </div>
@@ -236,8 +236,8 @@ class App extends Component {
                   value={this.state.newPosition}
                   onChange={event => this.setState({ newPosition: event.target.value })}
                   step="1"
-                  />
-                  <Button type="submit" color="success">Save</Button>
+                />
+                <Button type="submit" color="secondary">Save</Button>
               </InputGroup>
             </form>
           </div>
@@ -245,36 +245,36 @@ class App extends Component {
         <div className="row" style={styles.columnSpacing}>
           <div className="col-md-6">
             <form onSubmit={this.onSubmitNewDateOfBirth}>
-              <label htmlFor="new-dob">Your date of birth</label>
-              <div className="input-group">
-                <input type="date"
+
+              <InputGroup>
+                <InputGroupAddon addonType="prepend">Date of Birth:</InputGroupAddon>
+                <Input
+                  placeholder="Select your date of birth"
+                  type="date"
                   value={this.state.newDateOfBirth}
                   onChange={event => this.setState({ newDateOfBirth: event.target.value })}
-                  className="form-control"
-                  id="new-dob"
-                  placeholder="Select your date of birth..."
+                  step="1"
                 />
-                <span className="input-group-btn">
-                  <Button type="submit" color="info">Save to the blockchain</Button>
-                </span>
-              </div>
+                <Button type="submit" color="warning">Save</Button>
+              </InputGroup>
+
             </form>
           </div>
           <div className="col-md-6">
             <form onSubmit={this.onSubmitNewPhone}>
-              <label htmlFor="new-phone">Your best phone number (mobile)</label>
-              <div className="input-group">
-                <input type="text"
+
+              <InputGroup>
+                <InputGroupAddon addonType="prepend">Phone Number:</InputGroupAddon>
+                <Input
+                  placeholder="Enter your phone number"
+                  type="text"
                   value={this.state.newPhone}
                   onChange={event => this.setState({ newPhone: event.target.value })}
-                  className="form-control"
-                  id="new-phone"
-                  placeholder="Enter phone number here..."
+                  step="1"
                 />
-                <span className="input-group-btn">
-                  <Button type="submit" color="warning">Save to the blockchain</Button>
-                </span>
-              </div>
+                <Button type="submit" color="info">Save</Button>
+              </InputGroup>
+
             </form>
           </div>
         </div>
