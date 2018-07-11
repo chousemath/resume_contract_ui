@@ -2,7 +2,20 @@ import React, { Component } from 'react';
 import './App.css';
 import web3 from './web3.js';
 import resume from './resume';
-import { Button, Input, InputGroup, InputGroupAddon } from 'reactstrap';
+import {
+  Button, Input, InputGroup, InputGroupAddon,
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
+} from 'reactstrap';
 
 const emptyBytes32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 const waitingMessage = 'Waiting on transaction...';
@@ -122,7 +135,6 @@ class App extends Component {
       gender,
       manager,
       name,
-      phone,
       position,
       users,
       phone
@@ -192,96 +204,130 @@ class App extends Component {
     }
 
     return (
-      <div className="container">
-        {message}
-        <h2>Resume Contract</h2>
-        <hr />
-        <p>This contract is managed by {this.state.manager}</p>
-        <hr />
-        <p>Your name: {this.state.name}</p>
-        <hr />
-        <p>Your position: {this.state.position}</p>
-        <hr />
-        <p>Your date of birth: {this.state.dateOfBirth}</p>
-        <hr />
-        <p>Your gender: {this.state.gender}</p>
-        <hr />
-        <p>Your address: {this.state.address}</p>
-        <hr />
-        <p>Your phone number: {this.state.phone}</p>
-        <hr />
+      <div>
+        <Navbar color="light" light expand="md">
+          <NavbarBrand href="/">Resume Contract</NavbarBrand>
+          <NavbarToggler onClick={this.toggle} />
+          <Collapse isOpen={this.state.isOpen} navbar>
+            <Nav className="ml-auto" navbar>
+              <NavItem>
+                <NavLink href="https://github.com/chousemath/resume_contract">Contract-Repo</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="https://github.com/chousemath/resume_contract_ui">UI-Repo</NavLink>
+              </NavItem>
+              <UncontrolledDropdown nav inNavbar>
+                <DropdownToggle nav caret>
+                  Details
+                </DropdownToggle>
+                <DropdownMenu right>
+                  <DropdownItem>
+                    Manager: {this.state.manager}
+                  </DropdownItem>
+                  <DropdownItem>
+                    Option 2
+                  </DropdownItem>
+                  <DropdownItem divider />
+                  <DropdownItem>
+                    Reset
+                  </DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
+            </Nav>
+          </Collapse>
+        </Navbar>
 
-        <div className="row" style={styles.columnSpacing}>
-          <div className="col-md-6">
-            <form onSubmit={this.onSubmitNewName}>
-              <InputGroup>
-                <InputGroupAddon addonType="prepend">Full Name:</InputGroupAddon>
-                <Input
-                  placeholder="Enter your new name here"
-                  type="text"
-                  value={this.state.newName}
-                  onChange={event => this.setState({ newName: event.target.value })}
-                  step="1" />
-                <Button type="submit" color="primary">Save</Button>
-              </InputGroup>
-            </form>
+        <div className="container" style={{ marginTop: '16px' }}>
+          {message}
+
+          <div className="row">
+            <div className="col-md-3">
+              <div style={{ width: '200px', height: '200px', backgroundColor: 'gray', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <h1 style={{ color: '#fff' }}><b>?</b></h1>
+              </div>
+            </div>
+            <div className="col-md-9">
+              <p>{this.state.name}</p>
+              <p>{this.state.position}</p>
+              <p>Your date of birth: {this.state.dateOfBirth}</p>
+              <p>Your gender: {this.state.gender}</p>
+              <p>Your address: {this.state.address}</p>
+              <p>Your phone number: {this.state.phone}</p>
+            </div>
           </div>
-          <div className="col-md-6">
-            <form onSubmit={this.onSubmitNewPosition}>
-              <InputGroup>
-                <InputGroupAddon addonType="prepend">Current Position:</InputGroupAddon>
-                <Input
-                  placeholder="Enter your new position here"
-                  type="text"
-                  value={this.state.newPosition}
-                  onChange={event => this.setState({ newPosition: event.target.value })}
-                  step="1"
-                />
-                <Button type="submit" color="secondary">Save</Button>
-              </InputGroup>
-            </form>
+
+          <div className="row" style={styles.columnSpacing}>
+            <div className="col-md-6">
+              <form onSubmit={this.onSubmitNewName}>
+                <InputGroup>
+                  <InputGroupAddon addonType="prepend">Full Name:</InputGroupAddon>
+                  <Input
+                    placeholder="Enter your new name here"
+                    type="text"
+                    value={this.state.newName}
+                    onChange={event => this.setState({ newName: event.target.value })}
+                    step="1" />
+                  <Button type="submit" color="primary">Save</Button>
+                </InputGroup>
+              </form>
+            </div>
+            <div className="col-md-6">
+              <form onSubmit={this.onSubmitNewPosition}>
+                <InputGroup>
+                  <InputGroupAddon addonType="prepend">Current Position:</InputGroupAddon>
+                  <Input
+                    placeholder="Enter your new position here"
+                    type="text"
+                    value={this.state.newPosition}
+                    onChange={event => this.setState({ newPosition: event.target.value })}
+                    step="1"
+                  />
+                  <Button type="submit" color="secondary">Save</Button>
+                </InputGroup>
+              </form>
+            </div>
           </div>
-        </div>
-        <div className="row" style={styles.columnSpacing}>
-          <div className="col-md-6">
-            <form onSubmit={this.onSubmitNewDateOfBirth}>
+          <div className="row" style={styles.columnSpacing}>
+            <div className="col-md-6">
+              <form onSubmit={this.onSubmitNewDateOfBirth}>
 
-              <InputGroup>
-                <InputGroupAddon addonType="prepend">Date of Birth:</InputGroupAddon>
-                <Input
-                  placeholder="Select your date of birth"
-                  type="date"
-                  value={this.state.newDateOfBirth}
-                  onChange={event => this.setState({ newDateOfBirth: event.target.value })}
-                  step="1"
-                />
-                <Button type="submit" color="warning">Save</Button>
-              </InputGroup>
+                <InputGroup>
+                  <InputGroupAddon addonType="prepend">Date of Birth:</InputGroupAddon>
+                  <Input
+                    placeholder="Select your date of birth"
+                    type="date"
+                    value={this.state.newDateOfBirth}
+                    onChange={event => this.setState({ newDateOfBirth: event.target.value })}
+                    step="1"
+                  />
+                  <Button type="submit" color="warning">Save</Button>
+                </InputGroup>
 
-            </form>
+              </form>
+            </div>
+            <div className="col-md-6">
+              <form onSubmit={this.onSubmitNewPhone}>
+
+                <InputGroup>
+                  <InputGroupAddon addonType="prepend">Phone Number:</InputGroupAddon>
+                  <Input
+                    placeholder="Enter your phone number"
+                    type="text"
+                    value={this.state.newPhone}
+                    onChange={event => this.setState({ newPhone: event.target.value })}
+                    step="1"
+                  />
+                  <Button type="submit" color="info">Save</Button>
+                </InputGroup>
+
+              </form>
+            </div>
           </div>
-          <div className="col-md-6">
-            <form onSubmit={this.onSubmitNewPhone}>
-
-              <InputGroup>
-                <InputGroupAddon addonType="prepend">Phone Number:</InputGroupAddon>
-                <Input
-                  placeholder="Enter your phone number"
-                  type="text"
-                  value={this.state.newPhone}
-                  onChange={event => this.setState({ newPhone: event.target.value })}
-                  step="1"
-                />
-                <Button type="submit" color="info">Save</Button>
-              </InputGroup>
-
-            </form>
+          <hr />
+          <div className="well well-lg">
+            <p>Currently <span className="badge">{this.state.users.length}</span> users participating</p>
+            <p>{users}</p>
           </div>
-        </div>
-        <hr />
-        <div className="well well-lg">
-          <p>Currently <span className="badge">{this.state.users.length}</span> users participating</p>
-          <p>{users}</p>
         </div>
       </div>
     );
